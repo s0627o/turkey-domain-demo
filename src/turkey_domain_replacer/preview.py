@@ -121,6 +121,21 @@ def create_preview(state_dir: Path, port: int = 20203, *, public_origin: str | N
     app.jinja_env.auto_reload = True
     connection.close()
 
+    if public_origin:
+
+        def normalize_demo_tunnel_origin():
+            # Codespaces rewrites Host and Origin to its loopback target.
+            # Only this fake-data preview accepts that exact local transport;
+            # session and CSRF validation in web.py still run unchanged.
+            if (
+                request.remote_addr == "127.0.0.1"
+                and request.host == f"localhost:{port}"
+                and request.headers.get("Origin") == f"http://localhost:{port}"
+            ):
+                request.environ["HTTP_ORIGIN"] = public_origin
+
+        app.before_request_funcs[None].insert(0, normalize_demo_tunnel_origin)
+
     @app.after_request
     def simulate_work(response):
         # Synchronous only in this demo, so each confirmation shows the next screen.

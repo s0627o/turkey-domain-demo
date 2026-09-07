@@ -5,6 +5,40 @@ import pytest
 from turkey_domain_replacer.preview import create_preview
 
 
+@pytest.mark.parametrize("valid_csrf, expected", [(True, 303), (False, 403)])
+def test_codespaces_rewritten_loopback_origin(tmp_path, valid_csrf, expected):
+    app = create_preview(tmp_path, public_origin="https://demo-20203.app.github.dev")
+    client = app.test_client()
+    base = "http://localhost:20203"
+    client.get("/login", base_url=base, follow_redirects=True)
+    csrf = client.get_cookie("tdr_csrf").value
+    response = client.post(
+        "/flows/start",
+        base_url=base,
+        headers={"Origin": base},
+        data={"csrf_token": csrf if valid_csrf else "wrong"},
+        environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+    )
+    assert response.status_code == expected
+
+
+@pytest.mark.parametrize(
+    "remote, host", [("192.0.2.1", "localhost:20203"), ("127.0.0.1", "other.example")]
+)
+def test_codespaces_origin_compatibility_is_loopback_only(tmp_path, remote, host):
+    app = create_preview(tmp_path, public_origin="https://demo-20203.app.github.dev")
+    client = app.test_client()
+    client.get("/login", follow_redirects=True)
+    csrf = client.get_cookie("tdr_csrf").value
+    response = client.post(
+        "/flows/start",
+        headers={"Origin": "http://localhost:20203", "Host": host},
+        data={"csrf_token": csrf},
+        environ_overrides={"REMOTE_ADDR": remote},
+    )
+    assert response.status_code in {401, 403}
+
+
 @pytest.mark.parametrize("origin", [None, "https://demo-20203.app.github.dev"])
 def test_preview_runs_whole_flow_without_network_and_hides_provider_ids(tmp_path, origin):
     app = create_preview(tmp_path, public_origin=origin)
