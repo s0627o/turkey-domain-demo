@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="card wide">
+    <p class="eyebrow">域名替換進度</p>
+    <h1>{{ detail.flow.old_domain }} <span aria-hidden="true">→</span> {{ detail.flow.new_domain }}</h1>
+    <p class="status">{{ detail.flow.status.value | stage_label }}</p>
+    <p>{{ detail.flow.status.value | stage_description }}</p>
+
+    {% if detail.flow.status == statuses.AWAITING_PREPARATION_CONFIRMATION %}
+      <form method="post" action="{{ url_for('confirm_preparation', flow_id=detail.flow.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit">確認，開始準備新域名</button>
+      </form>
+    {% elif detail.flow.status == statuses.AWAITING_BACKOFFICE_CONFIRMATION %}
+      <form method="post" action="{{ url_for('confirm_backoffice', flow_id=detail.flow.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit">我已完成公司後台切換</button>
+      </form>
+    {% elif detail.flow.status == statuses.AWAITING_CLEANUP_CONFIRMATION %}
+      <h2>將清理的舊資源</h2>
+      <ul class="impact">
+        {% for description, count in impact %}<li>{{ description }}（{{ count }} 項）</li>{% endfor %}
+      </ul>
+      <p class="danger">執行後舊域名將無法連線。請輸入完整舊主域名確認。</p>
+      <form method="post" action="{{ url_for('confirm_cleanup', flow_id=detail.flow.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="old-domain">請輸入舊主域名：{{ detail.flow.old_domain }}</label>
+        <input id="old-domain" required autocomplete="off" name="old_domain" value="{{ submitted_domain }}" {% if domain_error %}aria-invalid="true" aria-describedby="domain-error" autofocus{% endif %}>
+        {% if domain_error %}<p id="domain-error" class="danger" role="alert">{{ domain_error }}</p>{% endif %}
+        <button class="danger-button" type="submit">執行舊資源清理</button>
+      </form>
+    {% elif detail.flow.status == statuses.FAILED_LOCKED %}
+      <p class="danger">處理完成前，暫時無法開始其他域名替換。</p>
+    {% endif %}
+
+    <h2>操作進度紀錄</h2>
+    <p class="time-note">以下時間皆為台北時間（UTC+8）。</p>
+    <ol class="timeline">
+      {% for event in detail.stages %}
+        <li><time>{{ event.occurred_at | taipei_time }}</time><strong>{% if event.stage == statuses.AWAITING_PREPARATION_CONFIRMATION %}取得新域名{% else %}{{ event.stage.value | stage_label }}{% endif %}</strong><span>{{ event.stage.value | stage_description }}</span></li>
+      {% endfor %}
+    </ol>
+  </section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{
+  "name": "Customer demo - fake data only",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "postCreateCommand": ["python", "-m", "pip", "install", "${containerWorkspaceFolder}"],
+  "postStartCommand": "nohup python -u -m turkey_domain_replacer.preview --public-origin \"https://$CODESPACE_NAME-20203.app.github.dev\" >/tmp/turkey-domain-demo.log 2>&1 &",
+  "forwardPorts": [20203],
+  "portsAttributes": {
+    "20203": {"label": "Customer demo (fake data)", "onAutoForward": "notify"}
+  }
+}

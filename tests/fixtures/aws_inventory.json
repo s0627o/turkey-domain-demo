@@ -1,0 +1,46 @@
+{
+  "complete": true,
+  "distributions": [
+    {
+      "id": "DIST-FUN",
+      "aliases": ["fun.old.example", "fun.current-safe.example"]
+    },
+    {
+      "id": "DIST-JOY",
+      "aliases": ["joy.old.example", "joy.current-safe.example"]
+    }
+  ],
+  "certificates": [
+    {
+      "arn": "arn:aws:acm:us-east-1:111111111111:certificate/old",
+      "sans": ["fun.old.example", "joy.old.example"],
+      "in_use_by": []
+    }
+  ],
+  "hosted_zones": [
+    {
+      "id": "ZONE-OLD",
+      "apex": "old.example",
+      "records": [
+        {"name": "old.example", "type": "NS"},
+        {"name": "old.example", "type": "SOA"},
+        {"name": "fun.old.example", "type": "A"},
+        {"name": "fun.old.example", "type": "AAAA"},
+        {"name": "joy.old.example", "type": "A"},
+        {"name": "joy.old.example", "type": "AAAA"}
+      ]
+    },
+    {
+      "id": "ZONE-NEW",
+      "apex": "new.example",
+      "records": [
+        {"name": "new.example", "type": "NS"},
+        {"name": "new.example", "type": "SOA"}
+      ]
+    }
+  ],
+  "registered_domains": [
+    {"name": "old.example", "auto_renew": true},
+    {"name": "new.example", "auto_renew": true}
+  ]
+}

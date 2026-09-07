@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}客服土耳其域名替換工具{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="{{ url_for('index') }}">域名替換工具</a>
+      <nav>
+        <a href="{{ url_for('history') }}">歷史</a>
+        {% if email %}<span>{{ email }}</span>
+        <form method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="link" type="submit">登出</button>
+        </form>
+        {% endif %}
+      </nav>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+  </body>
+</html>

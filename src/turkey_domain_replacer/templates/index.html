@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="card">
+    <p class="eyebrow">目前替換進度</p>
+    {% if flow %}
+      <h1>{{ flow.old_domain }} <span aria-hidden="true">→</span> {{ flow.new_domain }}</h1>
+      <p class="status">{{ flow.status.value | stage_label }}</p>
+      <p>目前有一組域名正在替換，完成前無法開始另一組。</p>
+      <a class="button" href="{{ url_for('flow_detail', flow_id=flow.id) }}">查看目前流程</a>
+    {% else %}
+      <h1>沒有進行中的替換</h1>
+      <p>系統會依 Google 試算表順序選取目前域名與下一個備胎。</p>
+      <form method="post" action="{{ url_for('start_flow') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit">開始取得下一組域名</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

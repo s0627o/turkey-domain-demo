@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}操作提示｜域名替換工具{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>操作提示</h1>
+  <p role="alert">{{ message }}</p>
+  {% if email %}<p><a class="button" href="{{ back_url }}">返回查看進度</a></p>{% endif %}
+  <p><a href="{{ login_url }}">重新登入</a></p>
+</section>
+{% endblock %}

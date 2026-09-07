@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}歷史｜客服土耳其域名替換工具{% endblock %}
+{% block content %}
+  <section class="card wide">
+    <a class="button" href="{{ url_for('index') }}">← 返回首頁</a>
+    <p class="eyebrow">唯讀</p>
+    <h1>替換歷史</h1>
+    <p class="time-note">時間皆為台北時間（UTC+8）。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>時間</th><th>舊域名 → 新域名</th><th>Google email</th><th>狀態</th><th>備註</th></tr></thead>
+        <tbody>
+          {% for flow in flows %}
+            <tr>
+              <td><a href="{{ url_for('flow_detail', flow_id=flow.id) }}">{{ flow.created_at | taipei_time }}</a></td>
+              <td>{{ flow.old_domain }} → {{ flow.new_domain }}</td>
+              <td>{{ flow.actor_email }}</td><td>{{ flow.status.value | stage_label }}</td><td>{% if flow.status == 'FAILED_LOCKED' %}請聯絡管理者處理{% else %}{{ flow.note }}{% endif %}</td>
+            </tr>
+          {% else %}<tr><td colspan="5">尚無紀錄</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}
