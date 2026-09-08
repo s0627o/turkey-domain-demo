@@ -23,7 +23,13 @@ from .commands import CommandService, DomainConfirmationError, InvalidTransition
 from .config import Settings
 from .db import connect
 from .models import FlowStatus
-from .presentation import operation_label, stage_description, stage_label, taipei_time
+from .presentation import (
+    backoffice_test_urls,
+    operation_label,
+    stage_description,
+    stage_label,
+    taipei_time,
+)
 from .repository import ActiveFlowExists, FlowLockUnavailable, InventoryUnavailable, Repository
 
 
@@ -218,6 +224,7 @@ def create_app(
             email=_session().email,
             domain_error=domain_error,
             submitted_domain=submitted_domain,
+            backoffice_test_urls=backoffice_test_urls(detail.flow.new_domain),
         )
 
     @app.post("/flows/<flow_id>/confirm-preparation")

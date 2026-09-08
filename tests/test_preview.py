@@ -2,6 +2,7 @@ import re
 
 import pytest
 
+from turkey_domain_replacer.presentation import backoffice_test_urls
 from turkey_domain_replacer.preview import create_preview
 
 
@@ -76,6 +77,9 @@ def test_preview_runs_whole_flow_without_network_and_hides_provider_ids(tmp_path
         follow_redirects=True,
     )
     body = response.get_data(as_text=True)
+    assert body.count('class="copy-url"') == 4
+    for item in backoffice_test_urls("new.example"):
+        assert item.url.replace("&", "&amp;") in body
     timeline = body.split('<ol class="timeline">')[1]
     assert timeline.index("正在更新域名紀錄") < timeline.index("等待你切換公司後台")
     response = client.post(

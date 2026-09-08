@@ -12,6 +12,48 @@
         <button type="submit">確認，開始準備新域名</button>
       </form>
     {% elif detail.flow.status == statuses.AWAITING_BACKOFFICE_CONFIRMATION %}
+      <section class="backoffice-test-urls" aria-labelledby="backoffice-test-urls-title">
+        <h2 id="backoffice-test-urls-title">切換前測試網址</h2>
+        <p>切換前請逐一開啟確認新域名可正常使用。網址只供試玩測試，不會自動開啟。</p>
+        <ul>
+          {% for item in backoffice_test_urls %}
+            <li>
+              <strong>{{ item.label }}</strong>
+              <code>{{ item.url }}</code>
+              <button class="copy-url" type="button" data-copy-url="{{ item.url }}">複製</button>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+      <script>
+        async function copyUrl(url) {
+          try {
+            await navigator.clipboard.writeText(url);
+            return true;
+          } catch {
+            const helper = document.createElement("textarea");
+            helper.value = url;
+            helper.setAttribute("readonly", "");
+            helper.style.position = "fixed";
+            helper.style.opacity = "0";
+            document.body.append(helper);
+            helper.select();
+            const copied = document.execCommand("copy");
+            helper.remove();
+            return copied;
+          }
+        }
+
+        document.querySelectorAll(".copy-url").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const copied = await copyUrl(button.dataset.copyUrl);
+            button.textContent = copied ? "已複製" : "無法複製";
+            window.setTimeout(() => {
+              button.textContent = "複製";
+            }, 1600);
+          });
+        });
+      </script>
       <form method="post" action="{{ url_for('confirm_backoffice', flow_id=detail.flow.id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">我已完成公司後台切換</button>

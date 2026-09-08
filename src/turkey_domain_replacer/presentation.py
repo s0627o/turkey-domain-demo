@@ -1,5 +1,6 @@
 """Operator-facing text; persisted status codes remain unchanged."""
 
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 STAGES = {
@@ -41,6 +42,43 @@ OPERATIONS = {
     "DELETE_UNUSED_CERTIFICATE": "刪除未使用的舊憑證",
     "DISABLE_AUTO_RENEW": "關閉舊域名自動續約",
 }
+
+
+@dataclass(frozen=True)
+class BackofficeTestUrl:
+    label: str
+    url: str
+
+
+_BACKOFFICE_TEST_PATHS = (
+    (
+        "v2",
+        "wsx",
+        "/M/index.html?currency=156&gameno=%1F%14%01W%5C%00%5D_%1A%0DF%01%06%05%1A%1D%17%0F%5D%00RP%0BU%60%0C%00%5BW%10%09AV%10I%1AP%03C+FGW6A%0B%0BF%08%16ALPOD%01%03Z%0DJ%0A%0BF%10%02%01%1E%16%11%00%5EE%11%0A%1BqL%06DLR%1BJ%1B%0E%15W%01%11%15%02%13RAUD%1B&lang=zh_tw&session=Guest&code=104",
+    ),
+    (
+        "v3",
+        "fun",
+        "/M/index.html?currency=156&gameno=%1F%14%01W%5C%00%5D_%1A%0DF%01%06%00%1A%1D%17%0F%5D%00RP%0BU%60%0C%00%5BW%10%09AV%10I%1AP%03C+FGW6A%0B%0BF%08%16ALPOD%01%03Z%0DJ%0A%0BF%10%02%01%1E%16%11%00%5EE%11%0A%1BqL%06DL%5C%1BJ%1B%0E%15W%01%11%15%02%13RAUD%1B&lang=zh_tw&session=Guest&code=101",
+    ),
+    (
+        "f3",
+        "play",
+        "/M/index.html?currency=156&gameno=%1F%14%01W%5C%00%5D_%1A%0DF%01%0E%07%1A%1D%17%0F%5D%00RP%0BU%60%0C%00%5BW%10%09AV%10I%1AP%03C+FGW6A%0B%0BF%08%16ALPOD%01%03Z%0DJ%0A%0BF%10%02%01%1E%16%11%00%5EE%11%0A%1BqL%06DL%5C%1BJ%1B%0E%15W%01%11%15%02%13RAUD%1B&lang=zh_tw&session=Guest&code=186",
+    ),
+    (
+        "c1",
+        "joy",
+        "/h5/Game191/index.html?currency=156&gameno=%1F%14%01W%5C%00%5D_%1A%0DF%01%0F%00%1A%1D%17%0F%5D%00RP%0BU%60%0C%00%5BW%10%09AV%10I%1AP%03C+FGW6A%0B%0BF%08%16ALPOD%01%03Z%0DJ%0A%0BF%10%02%01%1E%16%11%00%5EE%11%0A%1BqL%06DLP%1BJ%1B%0E%15W%01%11%15%02%13RAUD%1B&lang=zh_tw&session=Guest&code=191",
+    ),
+)
+
+
+def backoffice_test_urls(new_domain: str) -> tuple[BackofficeTestUrl, ...]:
+    return tuple(
+        BackofficeTestUrl(label, f"https://{subdomain}.{new_domain}{path}")
+        for label, subdomain, path in _BACKOFFICE_TEST_PATHS
+    )
 
 
 def stage_label(value):
